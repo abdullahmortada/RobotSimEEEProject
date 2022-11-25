@@ -1,13 +1,13 @@
-from roboticstoolbox import Bicycle, VehicleIcon 
+from roboticstoolbox import Bicycle, VehicleIcon, RandomPath
 from typing import Tuple, Union
 from math import atan2, pi
 import matplotlib.pyplot as plt
 
 class Robot(Bicycle):
-    def __init__(self, speed=3, tol=0.4, **kwargs): 
-        # anim = VehicleIcon(iconPath, scale=iconSize)
-        super().__init__(**kwargs)
-        self.init(self, plot=True)
+    def __init__(self, animPath:str, animScale=2, speed=3, tol=0.4, **kwargs): 
+        anim = VehicleIcon(animPath, scale=animScale)
+        super().__init__(animation=anim, control=RandomPath, **kwargs)
+        self.init(plot=True)
         self._tolerance = tol
         self._speed = speed
 
