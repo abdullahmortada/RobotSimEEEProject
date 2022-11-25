@@ -3,18 +3,19 @@ from typing import Tuple, Union
 from math import atan2, pi
 import matplotlib.pyplot as plt
 
-class robot(Bicycle):
-    def __init__(self, iconPath, iconSize:int=2, 
-                 pltDim=10, speed=3, tol=0.4,
-                 l=1, steer_max=..., **kwargs): 
-        self._anim = VehicleIcon(iconPath, scale=iconSize)
-        Bicycle.__init__(self, l=l, steer_max=steer_max, animation= self._anim, dim=pltDim, **kwargs)
+class Robot(Bicycle):
+    def __init__(self, speed=3, tol=0.4, **kwargs): 
+        # anim = VehicleIcon(iconPath, scale=iconSize)
+        super().__init__(**kwargs)
+        super().init(super, plot=True)
         self._tolerance = tol
         self._speed = speed
-        self.init(plot=True)
 
     def go(self, 
            goal: Tuple[Union[int,float], Union[int,float]]):
+        """
+        Function which takes goal point's x and y as a tuple, and simulates robot's movement to that position
+        """
         while(True):
             g = atan2(
                     goal[1] - self.x[1],
