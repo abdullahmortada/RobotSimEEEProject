@@ -7,7 +7,7 @@ class Robot(Bicycle):
     def __init__(self, speed=3, tol=0.4, **kwargs): 
         # anim = VehicleIcon(iconPath, scale=iconSize)
         super().__init__(**kwargs)
-        super().init(super, plot=True)
+        self.init(self, plot=True)
         self._tolerance = tol
         self._speed = speed
 
