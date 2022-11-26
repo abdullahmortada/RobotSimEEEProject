@@ -1,20 +1,42 @@
 from typing import Tuple, Union, List
 from queue import PriorityQueue
-from numpy import Infinity, shape
+from numpy import Infinity, shape, zeros
 
 Point = Tuple[Union[float, int], Union[float, int]]
 Interval = Point
 
 class ThetaStar:
-    def __init__(self, grid, goal: Tuple):
+    def __init__(self, grid, goal: Point, filter:bool = False, scale:int = 1):
         self.goal = goal
         self.grid = grid
+        if filter:
+            self.filterMap(scale)  
         self.xlim = (0, shape(grid)[1])
         self.ylim = (0, shape(grid)[0])
+        print(self.xlim)
         self.gScore: dict = {}
         self.parent: dict = {}
         self.visited = set()
         self.open = PriorityQueue()
+
+
+
+    def filterMap(self, scale: int):
+        if scale < 1:
+            print("Filter map aborted, invalid scale")
+            return self.grid
+
+        newGrid = zeros(shape(self.grid), int)
+        for _ in range(scale):
+            for i in range(self.xlim[1] - 1):
+                newGrid[:, i] = (self.grid[:, i] + self.grid[:, i + 1])
+
+            self.grid = newGrid
+
+            for i in range(self.ylim[1] - 1):
+                newGrid[i, :] = (self.grid[i, :] + self.grid[i + 1, :])
+
+            self.grid = newGrid
 
 
 
@@ -162,7 +184,7 @@ class ThetaStar:
             self.visited.add(s)
 
             for neighbor in self.gridNeighbors(s):
-                if self.grid[neighbor[1], neighbor[0]] == 1:
+                if self.grid[neighbor[1], neighbor[0]]:
                     continue
                 if neighbor not in self.visited:
                     if not self.pointInQ(neighbor):

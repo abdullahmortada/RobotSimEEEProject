@@ -1,8 +1,8 @@
 from roboticstoolbox import Bicycle, VehicleIcon, RandomPath
-from typing import Tuple, Union
+from typing import Union
 from math import atan2, pi
+from pathfind import Point
 import matplotlib.pyplot as plt
-import numpy as np
 
 class Robot(Bicycle):
     def __init__(self, map, animPath:Union[str, None] = None, animScale=2, speed=3, tol=0.4, **kwargs): 
@@ -27,8 +27,7 @@ class Robot(Bicycle):
         self._speed = speed
         self._map = map
 
-    def go(self, 
-           goal: Tuple[Union[int,float], Union[int,float]]):
+    def go(self, goal: Point):
         """
         Function which takes goal point's x and y as a tuple, and simulates robot's movement to that position
         """

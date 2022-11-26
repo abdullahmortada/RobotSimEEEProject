@@ -8,6 +8,7 @@ def main():
     vars = loadmat("../map1.mat")
     map = vars['map']
     th = ThetaStar(map, (20,90))
+    th.filterMap(3)
     points = th.plan((50, 30))
     veh = Robot(animPath="../car.png", map=map, dim=100, animScale=6, x0=[50,30,0])
     x = []
