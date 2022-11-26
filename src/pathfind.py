@@ -88,11 +88,11 @@ class ThetaStar:
 
                 y0 = y0 + sy
         return result
-
+#manhattan distance (the value of x + the value of y)
 
     def heuristic(self, point: Point):
         return abs(self.goal[0] - point[0]) + abs(self.goal[1] - point[1])
-
+#the distance from a to b
     def euclidean(self, a: Point, b: Point)-> float:
         return ((a[1] - b[1])**2 + (a[0] - b[0])**2)**0.5
 

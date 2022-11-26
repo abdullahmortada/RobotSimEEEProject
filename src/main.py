@@ -14,6 +14,7 @@ def main():
     y = []
     for i in range(np.shape(map)[0]):    
         for j in range(np.shape(map)[1]):
+#x is j and y is i
             if map[i, j]:
                 x.append(j)
                 y.append(i)
