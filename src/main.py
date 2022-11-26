@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 def main():
-    vars = loadmat("/home/ali/RobotSimEEEProject/map1.mat")
+    vars = loadmat("../map1.mat")
     map = vars['map']
     th = ThetaStar(map, (20,90))
     points = th.plan((50, 30))
