@@ -8,9 +8,12 @@ import numpy as np
 def main():
     vars = loadmat("../map1.mat")
     map = vars['map']
-    th = ThetaStar(map, filter=True, scale=3)
-    points = th.plan((20,90),(50, 30))
-    veh = Robot(animPath="../car.png", map=map, dim=100, animScale=6, x0=[20,90,0])
+    # th = ThetaStar(map, filter=True, scale=3)
+    # points = th.plan((20,90),(50, 30))
+    veh = Robot(animPath="../car.png", map=map, 
+                animScale=6, x0=[50,30,0],
+                filter=True, filterScale=2)
+    points = veh.plan((50, 30), (90, 30))
     x = []
     y = []
     for i in range(np.shape(map)[0]):    
@@ -22,7 +25,7 @@ def main():
 
     #plotting the points for the path of the robot
     plt.scatter(x, y)
-    plt.plot(20,90,'rx')
+    plt.plot(90,30,'rx')
     plt.plot(50,30,'gx')
     plt.gca().set_xlim(0, 100)
     plt.gca().set_ylim(0, 100)

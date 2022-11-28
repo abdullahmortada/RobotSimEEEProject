@@ -7,12 +7,12 @@ Interval = Point
 
 class PathSolver:
     #defining the init function to run only once in the begining of the code    
-    def __init__(self, grid, filter:bool=False, scale:int=1):
+    def __init__(self, grid, filter:bool=False, filterScale:int=1):
         self.grid = grid
         self.xlim = (0, shape(grid)[1] - 1)
         self.ylim = (0, shape(grid)[0] - 1)
         if filter:
-            self.filterMap(scale)  
+            self.filterMap(filterScale)  
 
 
     #changing the scale of the obstacle by a fixed amount to make the robot move further away from the obstacles 
@@ -134,8 +134,8 @@ class PathSolver:
 
 #defining the ThetaSTar path finder method as a class
 class ThetaStar(PathSolver):
-    def __init__(self, grid, filter:bool = False, scale:int = 1):
-        super().__init__(grid, filter, scale)
+    def __init__(self, grid, filter:bool = False, filterScale:int = 1):
+        super().__init__(grid, filter, filterScale)
         self.gScore: dict = {}
         self.parent: dict = {}
         self.visited = set()

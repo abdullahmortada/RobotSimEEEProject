@@ -1,11 +1,14 @@
 from roboticstoolbox import Bicycle, VehicleIcon, RandomPath
 from typing import Union
 from math import atan2, pi
-from pathfind import Point
+from pathfind import Point, ThetaStar
 import matplotlib.pyplot as plt
 
 class Robot(Bicycle):
-    def __init__(self, map, animPath:Union[str, None] = None, animScale=2, speed=3, tol=0.4, **kwargs): 
+    def __init__(self, map, animPath:Union[str, None] = None, 
+                 animScale=2, speed=3, tol=0.4, 
+                 solver = ThetaStar, filter:bool=False,
+                 filterScale:int=1, **kwargs): 
         """
         Child class of bicycle which provides premade functions for movement and pathfinding.
         Requires:
@@ -26,6 +29,8 @@ class Robot(Bicycle):
         self._tolerance = tol
         self._speed = speed
         self._map = map
+        self._solver = solver(map, filter, filterScale)
+
 
     def go(self, goal: Point):
         
@@ -46,4 +51,9 @@ class Robot(Bicycle):
             if((abs(self.x[0] - goal[0]) < self._tolerance) and 
                (abs(self.x[1] - goal[1]) < self._tolerance)):
                 break 
+
+
+    def plan(self, start: Point, goal: Point):
+        return self._solver.plan(start, goal)
+
 
