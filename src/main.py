@@ -13,9 +13,9 @@ def main():
     veh = Robot(
             animPath="../car.png", map=map, 
             animScale=6, x0=[50,30,0],
+            filter=True, filterScale=2,
                 )
-    veh.plan((50, 30), (90, 30))
-    points = veh._solver.pathPoints
+    points = veh.plan((50, 30), (90, 30))
     x = []
     y = []
     for i in range(np.shape(map)[0]):    
