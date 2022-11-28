@@ -5,7 +5,9 @@ from numpy import Infinity, shape, zeros
 Point = Tuple[Union[float, int], Union[float, int]]
 Interval = Point
 
+#defining the ThetaSTar path finder method as a class
 class ThetaStar:
+    #defining the init function to run only once in the begining of the code    
     def __init__(self, grid, goal: Point, filter:bool = False, scale:int = 1):
         self.goal = goal
         self.grid = grid
@@ -20,7 +22,7 @@ class ThetaStar:
         self.open = PriorityQueue()
 
 
-
+    #changing the scale of the obstacle by a fixed amount to make the robot move further away from the obstacles 
     def filterMap(self, scale: int):
         if scale < 1:
             print("Filter map aborted, invalid scale")
@@ -39,23 +41,14 @@ class ThetaStar:
             self.grid = newGrid
 
 
-
+    #checking that the points are in queue (array like) to check the plan easily
     def pointInQ(self, point: Point)-> bool:
         for item in self.open.queue:
             if point in item:
                 return True
         return False
 
-
-    def CheckLine(self, line: List[Point])-> bool:
-        for point in line:
-            if self.grid[int(point[1]), int(point[0])]:
-                return False
-
-        return True
-
-
-
+    #draw a line between the points to navigate the robot correctly
     def LineOfSight(self, start: Point, goal: Point)-> List[Tuple]:
         x0, y0 = start
         x1, y1 = goal
@@ -111,15 +104,24 @@ class ThetaStar:
                 y0 = y0 + sy
         return result
 
-    #manhattan distance (the value of x + the value of y)
+
+    #checking there is no obstacles in the LineOfSight (the robot moves from a point to point sucssesfully)
+    def CheckLine(self, line: List[Point])-> bool:
+        for point in line:
+            if self.grid[int(point[1]), int(point[0])]:
+                return False
+
+        return True
+
+    #Calculating manhattan distance (the value of x + the value of y)
     def heuristic(self, point: Point):
         return abs(self.goal[0] - point[0]) + abs(self.goal[1] - point[1])
 
-    #the distance from a to b
+    #Calculating the distance from a to b
     def euclidean(self, a: Point, b: Point)-> float:
         return ((a[1] - b[1])**2 + (a[0] - b[0])**2)**0.5
 
-
+    #Finding the neighbors of the grid point
     def gridNeighbors(self, point: Point)-> List[Tuple]:
         res: List[Tuple] = []
         if point[0] > self.xlim[0]:
@@ -136,7 +138,7 @@ class ThetaStar:
 
         return res
 
-
+    #Updating the score of the next point in the path
     def updateVertex(self, s: Point, neighbor: Point):
         if self.CheckLine(self.LineOfSight(self.parent[s], neighbor)):
             newG = self.gScore[self.parent[s]] + self.euclidean(self.parent[s], neighbor)
@@ -159,7 +161,7 @@ class ThetaStar:
                         break
                 self.open.put((self.gScore[neighbor] + self.heuristic(neighbor), neighbor))
 
-
+    #Reconstruct the best path for the robot with no obstacles
     def makePath(self, s:Point)-> List[Tuple]:
         total_path:List[Tuple] = [s]
 
@@ -168,7 +170,7 @@ class ThetaStar:
             s = self.parent[s]
         return total_path
 
-
+    #Tracing the plan that the robot will move in and checking that there is no obstacles in the path
     def plan(self, start: Point):
         self.gScore[start] = 0
         self.parent[start] = start

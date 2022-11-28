@@ -28,9 +28,8 @@ class Robot(Bicycle):
         self._map = map
 
     def go(self, goal: Point):
-        """
-        Function which takes goal point's x and y as a tuple, and simulates robot's movement to that position
-        """
+        
+        #Function which takes goal point's x and y as a tuple, and simulates robot's movement to that position
         while(True):
             g = atan2(
                     goal[1] - self.x[1],
