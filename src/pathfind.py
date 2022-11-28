@@ -5,20 +5,13 @@ from numpy import Infinity, shape, zeros
 Point = Tuple[Union[float, int], Union[float, int]]
 Interval = Point
 
-class ThetaStar:
-    def __init__(self, grid, goal: Point, filter:bool = False, scale:int = 1):
-        self.goal = goal
+class PathSolver:
+    def __init__(self, grid, filter:bool=False, scale:int=1):
         self.grid = grid
+        self.xlim = (0, shape(grid)[1] - 1)
+        self.ylim = (0, shape(grid)[0] - 1)
         if filter:
             self.filterMap(scale)  
-        self.xlim = (0, shape(grid)[1])
-        self.ylim = (0, shape(grid)[0])
-        print(self.xlim)
-        self.gScore: dict = {}
-        self.parent: dict = {}
-        self.visited = set()
-        self.open = PriorityQueue()
-
 
 
     def filterMap(self, scale: int):
@@ -37,15 +30,7 @@ class ThetaStar:
                 newGrid[i, :] = (self.grid[i, :] + self.grid[i + 1, :])
 
             self.grid = newGrid
-
-
-
-    def pointInQ(self, point: Point)-> bool:
-        for item in self.open.queue:
-            if point in item:
-                return True
-        return False
-
+        
 
     def CheckLine(self, line: List[Point])-> bool:
         for point in line:
@@ -111,9 +96,10 @@ class ThetaStar:
                 y0 = y0 + sy
         return result
 
+
     #manhattan distance (the value of x + the value of y)
-    def heuristic(self, point: Point):
-        return abs(self.goal[0] - point[0]) + abs(self.goal[1] - point[1])
+    def heuristic(self, point: Point, goal: Point):
+        return abs(goal[0] - point[0]) + abs(goal[1] - point[1])
 
     #the distance from a to b
     def euclidean(self, a: Point, b: Point)-> float:
@@ -136,8 +122,28 @@ class ThetaStar:
 
         return res
 
+    def plan(self):
+        pass
 
-    def updateVertex(self, s: Point, neighbor: Point):
+
+
+class ThetaStar(PathSolver):
+    def __init__(self, grid, filter:bool = False, scale:int = 1):
+        super().__init__(grid, filter, scale)
+        self.gScore: dict = {}
+        self.parent: dict = {}
+        self.visited = set()
+        self.open = PriorityQueue()
+
+
+    def pointInQ(self, point: Point)-> bool:
+        for item in self.open.queue:
+            if point in item:
+                return True
+        return False
+
+
+    def updateVertex(self, s: Point, neighbor: Point, goal: Point):
         if self.CheckLine(self.LineOfSight(self.parent[s], neighbor)):
             newG = self.gScore[self.parent[s]] + self.euclidean(self.parent[s], neighbor)
             if newG < self.gScore[neighbor]:
@@ -147,7 +153,7 @@ class ThetaStar:
                     if neighbor in item:
                         del item
                         break
-                self.open.put((self.gScore[neighbor] + self.heuristic(neighbor), neighbor))
+                self.open.put((self.gScore[neighbor] + self.heuristic(neighbor, goal), neighbor))
         else:
             newG = self.gScore[s] + self.euclidean(s, neighbor)
             if newG < self.gScore[neighbor]:
@@ -157,7 +163,7 @@ class ThetaStar:
                     if neighbor in item:
                         del item
                         break
-                self.open.put((self.gScore[neighbor] + self.heuristic(neighbor), neighbor))
+                self.open.put((self.gScore[neighbor] + self.heuristic(neighbor, goal), neighbor))
 
 
     def makePath(self, s:Point)-> List[Tuple]:
@@ -169,16 +175,16 @@ class ThetaStar:
         return total_path
 
 
-    def plan(self, start: Point):
+    def plan(self, start: Point, goal: Point):
         self.gScore[start] = 0
         self.parent[start] = start
 
-        self.open.put((self.heuristic(start), start))
+        self.open.put((self.heuristic(start, goal), start))
 
         while self.open:
             s = self.open.get()
             s = s[1]
-            if s == self.goal:
+            if s == goal:
                 return self.makePath(s)
 
             self.visited.add(s)
@@ -190,7 +196,7 @@ class ThetaStar:
                     if not self.pointInQ(neighbor):
                         self.gScore[neighbor] = Infinity 
                         self.parent[neighbor] = None 
-                    self.updateVertex(s, neighbor)
+                    self.updateVertex(s, neighbor, goal)
             
 
 

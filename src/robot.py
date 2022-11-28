@@ -5,7 +5,8 @@ from pathfind import Point
 import matplotlib.pyplot as plt
 
 class Robot(Bicycle):
-    def __init__(self, map, animPath:Union[str, None] = None, animScale=2, speed=3, tol=0.4, **kwargs): 
+    def __init__(self, map, animPath:Union[str, None] = None, 
+                 animScale=2, speed=3, tol=0.4, **kwargs): 
         """
         Child class of bicycle which provides premade functions for movement and pathfinding.
         Requires:
