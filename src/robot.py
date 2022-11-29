@@ -1,11 +1,14 @@
-from roboticstoolbox import Bicycle, VehicleIcon, RandomPath
-from typing import Union
+from roboticstoolbox import Bicycle, VehicleIcon, RandomPath, LandmarkMap, RangeBearingSensor
+from typing import Union, List
 from math import atan2, pi
 from pathfind import Point, ThetaStar
 import matplotlib.pyplot as plt
+import numpy as np
 
 class Robot(Bicycle):
-    def __init__(self, map, animPath:Union[str, None] = None, 
+    def __init__(self, map, randMap: Union[LandmarkMap, None] = None,
+                 sensorRange=2, sensorAngle:float=pi/4,
+                 animPath:Union[str, None] = None, 
                  animScale=2, speed=3, tol=0.4, 
                  solver = ThetaStar, filter:bool=False,
                  filterScale:int=1, **kwargs): 
@@ -14,11 +17,16 @@ class Robot(Bicycle):
         Requires:
             map: 2d occupancy grid, map to be traversed
         Optionals:
+            randMap: LandmarkMap, map of obstacles that robot will sense during traversal
+            sensorRange: int or float, max range of sensor 
+            sensorAngle: float, angle in radians of sensor range
             animPath: string, path to icon file for animation purposes
             animScale: int, animated icon's scale 
             speed: int or float, robot's velocity
             tol: float, tolerance for robot's goal position, smalled values are more accurate but
                 values have to be proportional to animScale
+            solver: Any available PathPlanner class from this library, planning algorithm of choice
+            filter and filterScale: bool and int, whether to filter at all and intensity of filter
         """
         anim = VehicleIcon(animPath, scale=animScale) if animPath else None
         super().__init__(animation=anim, control=RandomPath, **kwargs)
@@ -28,8 +36,11 @@ class Robot(Bicycle):
             self.init()
         self._tolerance = tol
         self._speed = speed
-        self._map = map
-        self._solver = solver(map, filter, filterScale)
+        self.solver = solver(map, filter, filterScale)
+        self.sensor = RangeBearingSensor(robot=self, map=randMap) if randMap else None
+        self.sensorRange = sensorRange 
+        self.sensorAngle = sensorAngle
+        self.points: List[Point] = []
 
 
     def go(self, goal: Point):
@@ -48,12 +59,47 @@ class Robot(Bicycle):
             if self._plot:
                 self._animation.update(self.x)
                 plt.pause(0.005)
+                
+            if self.sensor:
+                scanned = self.sensor.h(self.x)
+                r = scanned[:, 0]
+                index = np.where(r == min(r))
+                
+                if r[index] < self.sensorRange and abs(scanned[index, 1]) < self.sensorAngle:
+                    coord = self.sensor.g(self.x, scanned[index][0])
+                    if self.solver.grid[int(coord[1]), int(coord[0])] == 0:
+                        self.updateMap(coord)
+                        return False
+                    
+
             if((abs(self.x[0] - goal[0]) < self._tolerance) and 
                (abs(self.x[1] - goal[1]) < self._tolerance)):
-                break 
+                return True 
 
 
     def plan(self, start: Point, goal: Point):
-        return self._solver.plan(start, goal)
+        self.points = self.solver.plan(start, goal)
 
 
+    def updateMap(self, point:Point):
+        point = (int(point[0]), int(point[1]))
+        self.solver.grid[point[1], point[0]] = 1
+        for neighbor in self.solver.gridNeighbors(point):
+            self.solver.grid[neighbor[1], neighbor[0]] = 1
+
+    
+    def planAndGo(self, goal:Point):
+        self.plan((int(self.x[0]), int(self.x[1])), goal)
+        while True:
+            go = False
+            for point in self.points:
+                go = self.go(point)
+                if not go:
+                    print("not goed")
+                    break
+
+            if go:
+                break
+            else:
+                self.solver.resetSelf()
+                self.plan((int(self.x[0]), int(self.x[1])), goal)

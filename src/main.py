@@ -1,3 +1,4 @@
+from roboticstoolbox import LandmarkMap
 from robot import Robot 
 from pathfind import *
 from scipy.io import loadmat
@@ -10,12 +11,14 @@ def main():
     map = vars['map']
     # th = ThetaStar(map, filter=True, scale=3)
     # points = th.plan((20,90),(50, 30))
+    lmap = LandmarkMap(140, 100)
     veh = Robot(
             animPath="../car.png", map=map, 
-            animScale=6, x0=[50,30,0],
+            animScale=6,
             filter=True, filterScale=2,
+            randMap=lmap, x0=[50, 30, 0],
+            sensorRange=4
                 )
-    points = veh.plan((50, 30), (90, 30))
     x = []
     y = []
     for i in range(np.shape(map)[0]):    
@@ -27,12 +30,10 @@ def main():
 
     #plotting the points for the path of the robot
     plt.scatter(x, y)
-    plt.plot(90,30,'rx')
-    plt.plot(50,30,'gx')
+    lmap.plot()
     plt.gca().set_xlim(0, 100)
     plt.gca().set_ylim(0, 100)
-    for point in points:
-        veh.go((point[0], point[1]))
+    veh.planAndGo((20, 90))
     plt.pause(50)
     
 

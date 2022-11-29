@@ -45,7 +45,7 @@ class PathSolver:
 
 
     #draw a line between the points to navigate the robot correctly
-    def LineOfSight(self, start: Point, goal: Point)-> List[Tuple]:
+    def LineOfSight(self, start: Point, goal: Point)-> List[Point]:
         x0, y0 = start
         x1, y1 = goal
 
@@ -111,8 +111,8 @@ class PathSolver:
 
 
     #Finding the neighbors of the grid point
-    def gridNeighbors(self, point: Point)-> List[Tuple]:
-        res: List[Tuple] = []
+    def gridNeighbors(self, point: Point)-> List[Point]:
+        res: List[Point] = []
         if point[0] > self.xlim[0]:
             res.append((point[0] - 1, point[1]))
 
@@ -126,6 +126,10 @@ class PathSolver:
             res.append((point[0], point[1] + 1))
 
         return res
+
+
+    def resetSelf(self):
+        pass
 
     def plan(self):
         pass
@@ -175,8 +179,8 @@ class ThetaStar(PathSolver):
 
 
     #Reconstruct the best path for the robot with no obstacles
-    def makePath(self, s:Point)-> List[Tuple]:
-        total_path:List[Tuple] = [s]
+    def makePath(self, s:Point)-> List[Point]:
+        total_path:List[Point] = [s]
 
         while self.parent[s] != s:
             total_path = [self.parent[s]] + total_path
@@ -185,7 +189,7 @@ class ThetaStar(PathSolver):
 
 
     #Tracing the plan that the robot will move in and checking that there is no obstacles in the path
-    def plan(self, start: Point, goal: Point):
+    def plan(self, start: Point, goal: Point) -> List[Point]:
         self.gScore[start] = 0
         self.parent[start] = start
 
@@ -207,6 +211,13 @@ class ThetaStar(PathSolver):
                         self.gScore[neighbor] = Infinity 
                         self.parent[neighbor] = None 
                     self.updateVertex(s, neighbor, goal)
+
+
+    def resetSelf(self):
+        self.gScore.clear()
+        self.visited.clear()
+        self.parent.clear()
+        self.open.queue.clear()
             
 
 
