@@ -11,6 +11,7 @@ class PathSolver:
         self.grid = grid
         self.xlim = (0, shape(grid)[1] - 1)
         self.ylim = (0, shape(grid)[0] - 1)
+        self.vertices = []
         if filter:
             self.filterMap(filterScale)  
 
@@ -206,6 +207,11 @@ class ThetaStar(PathSolver):
             for neighbor in self.gridNeighbors(s):
                 if self.grid[neighbor[1], neighbor[0]]:
                     continue
+                if self.vertices:
+                    for vertex in self.vertices:
+                        if self.grid[int(vertex[1]), int(vertex[0])]:
+                            print("lel")
+                            continue
                 if neighbor not in self.visited:
                     if not self.pointInQ(neighbor):
                         self.gScore[neighbor] = Infinity 

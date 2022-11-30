@@ -1,6 +1,6 @@
 from roboticstoolbox import Bicycle, VehicleIcon, RandomPath, LandmarkMap, RangeBearingSensor
 from typing import Union, List
-from math import atan2, pi
+from math import atan2, cos, pi, sin
 from pathfind import Point, ThetaStar
 import matplotlib.pyplot as plt
 import numpy as np
@@ -9,7 +9,7 @@ class Robot(Bicycle):
     def __init__(self, map, randMap: Union[LandmarkMap, None] = None,
                  sensorRange=2, sensorAngle:float=pi/4,
                  animPath:Union[str, None] = None, 
-                 animScale=2, speed=3, tol=0.4, 
+                 animScale=2, scaleRatio=1, speed=3, tol=0.4, 
                  solver = ThetaStar, filter:bool=False,
                  filterScale:int=1, **kwargs): 
         """
@@ -40,8 +40,25 @@ class Robot(Bicycle):
         self.sensor = RangeBearingSensor(robot=self, map=randMap) if randMap else None
         self.sensorRange = sensorRange 
         self.sensorAngle = sensorAngle
+        y = animScale / 2
+        x = y * scaleRatio
+        self.vertexInfo = ((y**2 + x**2)**0.5, pi/2 - atan2(y, x))
+        self.vertices = []
+        self.updateVertices()
         self.points: List[Point] = []
 
+
+    def updateVertices(self):
+        theta1 = self.vertexInfo[1] + self.x[2]
+        theta2 = self.vertexInfo[1] - self.x[2]
+        x = self.vertexInfo[0] * cos(theta1)
+        y = self.vertexInfo[0] * sin(theta1)
+        x2 = self.vertexInfo[0] * cos(theta2)
+        y2 = self.vertexInfo[0] * sin(theta2)
+        self.vertices = [(self.x[0] + x, self.x[1] +  y), (self.x[0] - x,self.x[1] - y), (self.x[0] + x2, self.x[1] - y2), (self.x[0] - x2, self.x[1] + y2)]
+        self.solver.vertices = self.vertices
+            
+    
 
     def go(self, goal: Point):
         
@@ -56,6 +73,13 @@ class Robot(Bicycle):
                 steer = steer - 2*pi
 
             self.step(self._speed, steer)
+            self.updateVertices()
+
+            for vertex in self.vertices:
+                if self.solver.grid[int(vertex[1]), int(vertex[0])]:
+                    self.updateMap(vertex)
+                    return False
+
             if self._plot:
                 self._animation.update(self.x)
                 plt.pause(0.005)
@@ -95,7 +119,6 @@ class Robot(Bicycle):
             for point in self.points:
                 go = self.go(point)
                 if not go:
-                    print("not goed")
                     break
 
             if go:

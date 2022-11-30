@@ -9,14 +9,12 @@ import numpy as np
 def main():
     vars = loadmat("../map1.mat")
     map = vars['map']
-    # th = ThetaStar(map, filter=True, scale=3)
-    # points = th.plan((20,90),(50, 30))
     lmap = LandmarkMap(140, 100)
     veh = Robot(
             animPath="../car.png", map=map, 
-            animScale=6,
-            filter=True, filterScale=2,
-            randMap=lmap, x0=[50, 30, 0],
+            animScale=6, scaleRatio=0.4,
+            # filter=True, filterScale=2,
+            x0=[50, 30, 2], randMap=lmap, 
             sensorRange=4
                 )
     x = []
@@ -34,7 +32,7 @@ def main():
     plt.gca().set_xlim(0, 100)
     plt.gca().set_ylim(0, 100)
     veh.planAndGo((20, 90))
-    plt.pause(50)
+    plt.pause(1000)
     
 
 
