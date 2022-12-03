@@ -12,9 +12,9 @@ def main():
     lmap = LandmarkMap(140, 100)
     veh = Robot(
             animPath="../car.png", map=map, 
-            animScale=6, scaleRatio=0.4,
-            # filter=True, filterScale=2,
-            x0=[50, 30, 2], randMap=lmap, 
+            animScale=6, scaleRatio=1,
+            filter=True, filterScale=2,
+            x0=[50, 30, 0], randMap=lmap, 
             sensorRange=4
                 )
     x = []

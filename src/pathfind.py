@@ -1,3 +1,4 @@
+from math import atan2, cos, sin
 from typing import Tuple, Union, List
 from queue import PriorityQueue
 from numpy import Infinity, shape, zeros
@@ -7,11 +8,12 @@ Interval = Point
 
 class PathSolver:
     #defining the init function to run only once in the begining of the code    
-    def __init__(self, grid, filter:bool=False, filterScale:int=1):
+    def __init__(self, grid, filter:bool=False, filterScale:int=1, vertInfo = None):
         self.grid = grid
         self.xlim = (0, shape(grid)[1] - 1)
         self.ylim = (0, shape(grid)[0] - 1)
-        self.vertices = []
+        self.vertexInfo = vertInfo
+        # self.vertices = []
         if filter:
             self.filterMap(filterScale)  
 
@@ -35,11 +37,30 @@ class PathSolver:
             self.grid = newGrid
         
 
+    def calcVertices(self, vertexInfo, angle):
+        theta1 = vertexInfo[1] + angle 
+        theta2 = vertexInfo[1] - angle 
+        x = vertexInfo[0] * cos(theta1)
+        y = vertexInfo[0] * sin(theta1)
+        x2 = vertexInfo[0] * cos(theta2)
+        y2 = vertexInfo[0] * sin(theta2)
+        return [(x, y), (-x, -y), (x2, -y2), (-x2, y2)]
+
+
     #checking there is no obstacles in the LineOfSight (the robot moves from a point to point sucssesfully)
     def CheckLine(self, line: List[Point])-> bool:
+        if self.vertexInfo:
+            angle = atan2(line[-1][1] - line[0][1], line[-1][0] - line[0][0])
+            vertices = self.calcVertices(self.vertexInfo, angle)
+
         for point in line:
             if self.grid[int(point[1]), int(point[0])]:
                 return False
+            if self.vertexInfo:
+                for vert in vertices:
+                    if self.grid[int(point[1] + vert[1]), int(point[0] + vert[0])]:
+                        return False
+
 
         return True
 
@@ -139,8 +160,8 @@ class PathSolver:
 
 #defining the ThetaSTar path finder method as a class
 class ThetaStar(PathSolver):
-    def __init__(self, grid, filter:bool = False, filterScale:int = 1):
-        super().__init__(grid, filter, filterScale)
+    def __init__(self, grid, filter:bool = False, filterScale:int = 1, vertInfo = None):
+        super().__init__(grid, filter, filterScale, vertInfo)
         self.gScore: dict = {}
         self.parent: dict = {}
         self.visited = set()
@@ -207,11 +228,6 @@ class ThetaStar(PathSolver):
             for neighbor in self.gridNeighbors(s):
                 if self.grid[neighbor[1], neighbor[0]]:
                     continue
-                if self.vertices:
-                    for vertex in self.vertices:
-                        if self.grid[int(vertex[1]), int(vertex[0])]:
-                            print("lel")
-                            continue
                 if neighbor not in self.visited:
                     if not self.pointInQ(neighbor):
                         self.gScore[neighbor] = Infinity 

@@ -36,7 +36,6 @@ class Robot(Bicycle):
             self.init()
         self._tolerance = tol
         self._speed = speed
-        self.solver = solver(map, filter, filterScale)
         self.sensor = RangeBearingSensor(robot=self, map=randMap) if randMap else None
         self.sensorRange = sensorRange 
         self.sensorAngle = sensorAngle
@@ -45,6 +44,7 @@ class Robot(Bicycle):
         self.vertexInfo = ((y**2 + x**2)**0.5, pi/2 - atan2(y, x))
         self.vertices = []
         self.updateVertices()
+        self.solver = solver(map, filter, filterScale, self.vertexInfo)
         self.points: List[Point] = []
 
 
@@ -56,7 +56,7 @@ class Robot(Bicycle):
         x2 = self.vertexInfo[0] * cos(theta2)
         y2 = self.vertexInfo[0] * sin(theta2)
         self.vertices = [(self.x[0] + x, self.x[1] +  y), (self.x[0] - x,self.x[1] - y), (self.x[0] + x2, self.x[1] - y2), (self.x[0] - x2, self.x[1] + y2)]
-        self.solver.vertices = self.vertices
+        # self.solver.vertices = self.vertices
             
     
 
@@ -75,10 +75,11 @@ class Robot(Bicycle):
             self.step(self._speed, steer)
             self.updateVertices()
 
-            for vertex in self.vertices:
-                if self.solver.grid[int(vertex[1]), int(vertex[0])]:
-                    self.updateMap(vertex)
-                    return False
+            # for i in range(len(self.vertices)):
+            #     vertex = self.vertices[i]
+            #     if self.solver.grid[int(vertex[1]), int(vertex[0])]:
+            #         self.updateMap(vertex)
+            #         return False
 
             if self._plot:
                 self._animation.update(self.x)
