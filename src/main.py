@@ -14,8 +14,8 @@ def main():
             animPath="../car.png", map=map, 
             animScale=6, scaleRatio=1,
             filter=True, filterScale=2,
-            x0=[50, 30, 0], randMap=lmap, 
-            sensorRange=4
+            x0=[50, 30, 0], solver=BreadthFirst, randMap=lmap, 
+            # sensorRange=4,
                 )
     x = []
     y = []

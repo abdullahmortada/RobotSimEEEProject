@@ -1,6 +1,6 @@
 from math import atan2, cos, sin
 from typing import Tuple, Union, List
-from queue import PriorityQueue
+from queue import PriorityQueue, Queue
 from numpy import Infinity, shape, zeros
 
 Point = Tuple[Union[float, int], Union[float, int]]
@@ -8,7 +8,7 @@ Interval = Point
 
 class PathSolver:
     #defining the init function to run only once in the begining of the code    
-    def __init__(self, grid, filter:bool=False, filterScale:int=1, vertInfo = None):
+    def __init__(self, grid, filter:bool=False, filterScale:int=1, vertInfo:List= []):
         self.grid = grid
         self.xlim = (0, shape(grid)[1] - 1)
         self.ylim = (0, shape(grid)[0] - 1)
@@ -37,13 +37,13 @@ class PathSolver:
         
 
     #calculates where the vertices of the robot will be ahead of time, so it can be considered while planning a path
-    def calcVertices(self, vertexInfo, angle):
-        theta1 = vertexInfo[1] + angle 
-        theta2 = vertexInfo[1] - angle 
-        x = vertexInfo[0] * cos(theta1)
-        y = vertexInfo[0] * sin(theta1)
-        x2 = vertexInfo[0] * cos(theta2)
-        y2 = vertexInfo[0] * sin(theta2)
+    def calcVertices(self, angle):
+        theta1 = self.vertexInfo[1] + angle 
+        theta2 = self.vertexInfo[1] - angle 
+        x = self.vertexInfo[0] * cos(theta1)
+        y = self.vertexInfo[0] * sin(theta1)
+        x2 = self.vertexInfo[0] * cos(theta2)
+        y2 = self.vertexInfo[0] * sin(theta2)
         return [(x, y), (-x, -y), (x2, -y2), (-x2, y2)]
 
 
@@ -51,7 +51,7 @@ class PathSolver:
     def CheckLine(self, line: List[Point])-> bool:
         if self.vertexInfo:
             angle = atan2(line[-1][1] - line[0][1], line[-1][0] - line[0][0])
-            vertices = self.calcVertices(self.vertexInfo, angle)
+            vertices = self.calcVertices(angle)
 
         for point in line:
             if self.grid[int(point[1]), int(point[0])]:
@@ -246,3 +246,53 @@ class ThetaStar(PathSolver):
             
 
 
+class BreadthFirst(PathSolver):
+    def __init__(self, grid, filter:bool = False, filterScale:int = 1, vertInfo = None):
+        super().__init__(grid, filter, filterScale, vertInfo)
+        self.frontier = Queue()
+        self.parent = dict()
+
+
+    def makePath(self, goal: Point) -> List[Point]:
+        res = []
+        current = goal 
+        while self.parent[current] != None:
+            res.insert(0, current)
+            current = self.parent[current]
+
+        res.insert(0, current)
+        self.resetSelf()
+        return res
+
+
+    def plan(self, start: Point, goal: Point) -> List[Point]:
+        self.frontier.put(start)
+        self.parent[start] = None
+
+        while not self.frontier.empty():
+            current = self.frontier.get()
+            if current == goal:
+                return self.makePath(goal)
+
+            for neighbor in self.gridNeighbors(current):
+                if self.grid[neighbor[1], neighbor[0]]:
+                    continue
+
+                if self.vertexInfo:
+                    angle = atan2(neighbor[1] - current[1], neighbor[0] - current[0])
+                    for vertex in self.calcVertices(angle):
+                        if not (self.ylim[0] < neighbor[1] + int(vertex[1]) < self.ylim[1]) or not (self.xlim[0] < neighbor[0] + int(vertex[0]) < self.xlim[0]):
+                                continue
+
+                        if self.grid[neighbor[1] + int(vertex[1]), neighbor[0] + int(vertex[0])]:
+                            continue
+
+                if neighbor not in self.parent:
+                    self.frontier.put(neighbor)
+                    self.parent[neighbor] = current
+
+        return []
+
+    def resetSelf(self):
+        self.parent.clear()
+        self.frontier = Queue()
