@@ -13,7 +13,6 @@ class PathSolver:
         self.xlim = (0, shape(grid)[1] - 1)
         self.ylim = (0, shape(grid)[0] - 1)
         self.vertexInfo = vertInfo
-        # self.vertices = []
         if filter:
             self.filterMap(filterScale)  
 
@@ -37,6 +36,7 @@ class PathSolver:
             self.grid = newGrid
         
 
+    #calculates where the vertices of the robot will be ahead of time, so it can be considered while planning a path
     def calcVertices(self, vertexInfo, angle):
         theta1 = vertexInfo[1] + angle 
         theta2 = vertexInfo[1] - angle 
@@ -47,7 +47,7 @@ class PathSolver:
         return [(x, y), (-x, -y), (x2, -y2), (-x2, y2)]
 
 
-    #checking there is no obstacles in the LineOfSight (the robot moves from a point to point sucssesfully)
+    #checking there is no obstacles in the LineOfSight (the robot moves from a point to point sucssesfully), and vertices will not collide while following the line
     def CheckLine(self, line: List[Point])-> bool:
         if self.vertexInfo:
             angle = atan2(line[-1][1] - line[0][1], line[-1][0] - line[0][0])
@@ -158,7 +158,7 @@ class PathSolver:
 
 
 
-#defining the ThetaSTar path finder method as a class
+#defining the ThetaStar path finder method as a class
 class ThetaStar(PathSolver):
     def __init__(self, grid, filter:bool = False, filterScale:int = 1, vertInfo = None):
         super().__init__(grid, filter, filterScale, vertInfo)
@@ -166,9 +166,10 @@ class ThetaStar(PathSolver):
         self.parent: dict = {}
         self.visited = set()
         self.open = PriorityQueue()
+        #initialized parent PathSolver class, then required hash tables and queues
 
 
-    #checking that the points are in queue (array like) to check the plan easily
+    #checking that the points are in the priority queue (array like)
     def pointInQ(self, point: Point)-> bool:
         for item in self.open.queue:
             if point in item:
@@ -176,7 +177,7 @@ class ThetaStar(PathSolver):
         return False
 
 
-    #Updating the score of the next point in the path
+    #Updating the score of the next point in the path, prioritizing the points parent as it provides a lower score
     def updateVertex(self, s: Point, neighbor: Point, goal: Point):
         if self.CheckLine(self.LineOfSight(self.parent[s], neighbor)):
             newG = self.gScore[self.parent[s]] + self.euclidean(self.parent[s], neighbor)
@@ -207,6 +208,7 @@ class ThetaStar(PathSolver):
         while self.parent[s] != s:
             total_path = [self.parent[s]] + total_path
             s = self.parent[s]
+        self.resetSelf()
         return total_path
 
 
@@ -235,6 +237,7 @@ class ThetaStar(PathSolver):
                     self.updateVertex(s, neighbor, goal)
 
 
+    #emptying all queues and hash tables for recalculation
     def resetSelf(self):
         self.gScore.clear()
         self.visited.clear()

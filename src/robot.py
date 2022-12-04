@@ -39,15 +39,19 @@ class Robot(Bicycle):
         self.sensor = RangeBearingSensor(robot=self, map=randMap) if randMap else None
         self.sensorRange = sensorRange 
         self.sensorAngle = sensorAngle
+
+        # Calculating dimensions to use for vertices, and then calculating and storing actual vertex position
         y = animScale / 2
         x = y * scaleRatio
         self.vertexInfo = ((y**2 + x**2)**0.5, pi/2 - atan2(y, x))
         self.vertices = []
         self.updateVertices()
+
         self.solver = solver(map, filter, filterScale, self.vertexInfo)
         self.points: List[Point] = []
 
 
+    #Calculating vertices using vertex info which contains hypotenuse and angle from origin of robot to vertex, and applying simple trigonometry
     def updateVertices(self):
         theta1 = self.vertexInfo[1] + self.x[2]
         theta2 = self.vertexInfo[1] - self.x[2]
@@ -56,13 +60,10 @@ class Robot(Bicycle):
         x2 = self.vertexInfo[0] * cos(theta2)
         y2 = self.vertexInfo[0] * sin(theta2)
         self.vertices = [(self.x[0] + x, self.x[1] +  y), (self.x[0] - x,self.x[1] - y), (self.x[0] + x2, self.x[1] - y2), (self.x[0] - x2, self.x[1] + y2)]
-        # self.solver.vertices = self.vertices
             
-    
 
+    #Function which takes goal point's x and y as a tuple, and simulates robot's movement to that position
     def go(self, goal: Point):
-        
-        #Function which takes goal point's x and y as a tuple, and simulates robot's movement to that position
         while(True):
             g = atan2(
                     goal[1] - self.x[1],
@@ -72,19 +73,16 @@ class Robot(Bicycle):
             if steer > pi:
                 steer = steer - 2*pi
 
+            #moving and updating vertex location
             self.step(self._speed, steer)
             self.updateVertices()
 
-            # for i in range(len(self.vertices)):
-            #     vertex = self.vertices[i]
-            #     if self.solver.grid[int(vertex[1]), int(vertex[0])]:
-            #         self.updateMap(vertex)
-            #         return False
-
+            #only animating if user chose to plot robot
             if self._plot:
                 self._animation.update(self.x)
                 plt.pause(0.005)
                 
+            #adding closest scanned obstacle to the grid if it has not been seen before
             if self.sensor:
                 scanned = self.sensor.h(self.x)
                 r = scanned[:, 0]
@@ -102,10 +100,12 @@ class Robot(Bicycle):
                 return True 
 
 
+    #short hand method which just calls the solver's plan method
     def plan(self, start: Point, goal: Point):
         self.points = self.solver.plan(start, goal)
 
 
+    #takes a point and places a 1 in the occupancy grid in its position and in it's neighbor positions
     def updateMap(self, point:Point):
         point = (int(point[0]), int(point[1]))
         self.solver.grid[point[1], point[0]] = 1
@@ -113,6 +113,7 @@ class Robot(Bicycle):
             self.solver.grid[neighbor[1], neighbor[0]] = 1
 
     
+    #easy to use method which automatically plans and moves to goal point using calculated path, and recalculated path if a new obstacle is scanned
     def planAndGo(self, goal:Point):
         self.plan((int(self.x[0]), int(self.x[1])), goal)
         while True:
@@ -125,5 +126,4 @@ class Robot(Bicycle):
             if go:
                 break
             else:
-                self.solver.resetSelf()
                 self.plan((int(self.x[0]), int(self.x[1])), goal)
