@@ -5,17 +5,20 @@ from scipy.io import loadmat
 import matplotlib.pyplot as plt
 import numpy as np
 
-#defining the main function (works as a launcher for the robot)
+#Important note: "Before ruining the code you have to make sure that you are in the folder in the terminal"
+
+
+#defining the main function (works as a launcher for the robot).
 def main():
-    vars = loadmat("../map1.mat")
+    vars = loadmat("./map1.mat")
     map = vars['map']
     lmap = LandmarkMap(140, 100)
     veh = Robot(
-            animPath="../car.png", map=map, 
+            animPath="./car.png", map=map, 
             animScale=6, scaleRatio=1,
             filter=True, filterScale=2,
             x0=[50, 30, 0], solver=BreadthFirst, randMap=lmap, 
-            # sensorRange=4,
+            sensorRange=4,
                 )
     x = []
     y = []
@@ -31,7 +34,8 @@ def main():
     lmap.plot()
     plt.gca().set_xlim(0, 100)
     plt.gca().set_ylim(0, 100)
-    #moving to a goal point
+    
+    #moving to the goal point
     veh.planAndGo((20, 90))
     plt.pause(1000)
     
