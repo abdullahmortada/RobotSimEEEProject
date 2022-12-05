@@ -127,6 +127,7 @@ class Robot(Bicycle):
                 break
             else:
                 self.plan((int(self.x[0]), int(self.x[1])), goal)
+    #Trajectory function (moving through the path at a certain time)
     def speedo(self):
          startpoint1 = input("please enter x  for the starting point")
          startpoint2 = input("please enter y  for the starting point")
