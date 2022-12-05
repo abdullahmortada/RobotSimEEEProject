@@ -17,7 +17,7 @@ class PathSolver:
             self.filterMap(filterScale)  
 
 
-    #changing the scale of the obstacle by a fixed amount to make the robot move further away from the obstacles 
+    #changing the scale of the obstacle by a fixed amount to make the robot move further away from the obstacles. 
     def filterMap(self, scale: int):
         if scale < 1:
             print("Filter map aborted, invalid scale")
@@ -36,7 +36,7 @@ class PathSolver:
             self.grid = newGrid
         
 
-    #calculates where the vertices of the robot will be ahead of time, so it can be considered while planning a path
+    #calculates where the vertices of the robot will be ahead of time, so it can be considered while planning a path.
     def calcVertices(self, angle):
         theta1 = self.vertexInfo[1] + angle 
         theta2 = self.vertexInfo[1] - angle 
@@ -47,7 +47,7 @@ class PathSolver:
         return [(x, y), (-x, -y), (x2, -y2), (-x2, y2)]
 
 
-    #checking there is no obstacles in the LineOfSight (the robot moves from a point to point sucssesfully), and vertices will not collide while following the line
+    #checking there is no obstacles in the LineOfSight (the robot moves from a point to point sucssesfully), and vertices will not collide while following the line.
     def CheckLine(self, line: List[Point])-> bool:
         if self.vertexInfo:
             angle = atan2(line[-1][1] - line[0][1], line[-1][0] - line[0][0])
@@ -66,7 +66,7 @@ class PathSolver:
 
 
 
-    #draw a line between the points to navigate the robot correctly
+    #draw a line between the points to navigate the robot between the points correctly
     def LineOfSight(self, start: Point, goal: Point)-> List[Point]:
         x0, y0 = start
         x1, y1 = goal
