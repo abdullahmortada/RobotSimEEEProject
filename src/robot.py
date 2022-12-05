@@ -127,3 +127,11 @@ class Robot(Bicycle):
                 break
             else:
                 self.plan((int(self.x[0]), int(self.x[1])), goal)
+    def speedo(self):
+         startpoint1 = input("please enter x  for the starting point")
+         startpoint2 = input("please enter y  for the starting point")
+         endpoint1 = input("please enter x  for the ending point")
+         endpoint2 = input("please enter y for the ending point")
+         time= input("please add time for this operation")
+         speed= (self.solve.heuristic((startpoint1,startpoint2),(endpoint1,endpoint2)))/time 
+         return speed
