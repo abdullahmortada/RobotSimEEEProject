@@ -49,10 +49,12 @@ class PathSolver:
 
     #checking there is no obstacles in the LineOfSight (the robot moves from a point to point sucssesfully), and vertices will not collide while following the line.
     def CheckLine(self, line: List[Point])-> bool:
+        #calculate the supposed vertex positions if the robot were to pass through this line
         if self.vertexInfo:
             angle = atan2(line[-1][1] - line[0][1], line[-1][0] - line[0][0])
             vertices = self.calcVertices(angle)
 
+        #for each point check if it has an obstacle, and then if any of the vertices will collide
         for point in line:
             if self.grid[int(point[1]), int(point[0])]:
                 return False
@@ -66,8 +68,9 @@ class PathSolver:
 
 
 
-    #draw a line between the points to navigate the robot between the points correctly
+    #draw a line between two points, which will be used by checkline method 
     def LineOfSight(self, start: Point, goal: Point)-> List[Point]:
+        #initialize starting values and intervals to be used
         x0, y0 = start
         x1, y1 = goal
 
@@ -89,6 +92,7 @@ class PathSolver:
         f = 0
         result = []
 
+        #increment using y if dx is bigger, else using x
         if dx >= dy:
             while x0 != x1:
                 f = f + dy
@@ -98,6 +102,7 @@ class PathSolver:
                     y0 = y0 + sy
                     f = f - dx
                 if f != 0:
+                    #there is a gradient so a second point at the same x value
                     result.append((x0+(sx-1)/2, y0+(sy-1)/2))
                 if dy == 0:
                     a = (x0+(sx-1)/2, y0)
@@ -150,6 +155,7 @@ class PathSolver:
         return res
 
 
+    #shell methods that will be redefined polymorphically in child classes
     def resetSelf(self):
         pass
 
@@ -161,12 +167,12 @@ class PathSolver:
 #defining the ThetaStar path finder method as a class
 class ThetaStar(PathSolver):
     def __init__(self, grid, filter:bool = False, filterScale:int = 1, vertInfo = None):
+        #initialized parent PathSolver class, then required hash tables and queues
         super().__init__(grid, filter, filterScale, vertInfo)
         self.gScore: dict = {}
         self.parent: dict = {}
         self.visited = set()
         self.open = PriorityQueue()
-        #initialized parent PathSolver class, then required hash tables and queues
 
 
     #checking that the points are in the priority queue (array like)
@@ -177,9 +183,12 @@ class ThetaStar(PathSolver):
         return False
 
 
-    #Updating the score of the next point in the path, prioritizing the points parent as it provides a lower score
-    def updateVertex(self, s: Point, neighbor: Point, goal: Point):
+    #Updating the score of the next point in the path, prioritizing the points parent as would provide a lower score
+    def updatePoint(self, s: Point, neighbor: Point, goal: Point):
+        #check if there is an unobstructed line of sight between the new point and the original point's parent
+        #in that case the score and parent will ignore the old point and use its parent
         if self.CheckLine(self.LineOfSight(self.parent[s], neighbor)):
+            #calculating the new score, and replacing it as the new score if it is more optimal than the existing one
             newG = self.gScore[self.parent[s]] + self.euclidean(self.parent[s], neighbor)
             if newG < self.gScore[neighbor]:
                 self.gScore[neighbor] = newG 
@@ -190,6 +199,7 @@ class ThetaStar(PathSolver):
                         break
                 self.open.put((self.gScore[neighbor] + self.heuristic(neighbor, goal), neighbor))
         else:
+            #same as the code before, but using the point and not it's parent, as there is no unobstructed path between the parent and the next point
             newG = self.gScore[s] + self.euclidean(s, neighbor)
             if newG < self.gScore[neighbor]:
                 self.gScore[neighbor] = newG 
@@ -205,6 +215,7 @@ class ThetaStar(PathSolver):
     def makePath(self, s:Point)-> List[Point]:
         total_path:List[Point] = [s]
 
+        #following the path from goal point till start using each node's parent node
         while self.parent[s] != s:
             total_path = [self.parent[s]] + total_path
             s = self.parent[s]
@@ -212,29 +223,36 @@ class ThetaStar(PathSolver):
         return total_path
 
 
-    #Tracing the plan that the robot will move in and checking that there is no obstacles in the path
+    #Planning the path that the robot will move in
     def plan(self, start: Point, goal: Point) -> List[Point]:
         self.gScore[start] = 0
         self.parent[start] = start
 
         self.open.put((self.heuristic(start, goal), start))
 
+        #loop while there are unchecked points in priority queue
         while self.open:
             s = self.open.get()
             s = s[1]
+
+            #return the reconstructed path if goal is reached
             if s == goal:
                 return self.makePath(s)
 
             self.visited.add(s)
 
+            #checking all the neighbors of current point
             for neighbor in self.gridNeighbors(s):
+                #not processing neighbor if it contains an obstacle
                 if self.grid[neighbor[1], neighbor[0]]:
                     continue
+
+                #if point has not already been visited, its score or cost is updated, cost and parent are initialized if point is not already in the queue
                 if neighbor not in self.visited:
                     if not self.pointInQ(neighbor):
                         self.gScore[neighbor] = Infinity 
                         self.parent[neighbor] = None 
-                    self.updateVertex(s, neighbor, goal)
+                    self.updatePoint(s, neighbor, goal)
 
 
     #emptying all queues and hash tables for recalculation
@@ -246,6 +264,7 @@ class ThetaStar(PathSolver):
             
 
 
+#second solver class for demonstration of the differences between the two algorithms
 class BreadthFirst(PathSolver):
     def __init__(self, grid, filter:bool = False, filterScale:int = 1, vertInfo = None):
         super().__init__(grid, filter, filterScale, vertInfo)
@@ -256,6 +275,7 @@ class BreadthFirst(PathSolver):
     def makePath(self, goal: Point) -> List[Point]:
         res = []
         current = goal 
+        #trace back through the parent dictionary to reach start point from end point, reconstructing path along the way
         while self.parent[current] != None:
             res.insert(0, current)
             current = self.parent[current]
@@ -269,15 +289,19 @@ class BreadthFirst(PathSolver):
         self.frontier.put(start)
         self.parent[start] = None
 
+        #go through the queue of points until it is empty
         while not self.frontier.empty():
             current = self.frontier.get()
+            #return reconstructed path if reached goal
             if current == goal:
                 return self.makePath(goal)
 
+            #check point neighbors
             for neighbor in self.gridNeighbors(current):
                 if self.grid[neighbor[1], neighbor[0]]:
                     continue
 
+                #make sure vertices dont collide with any obstacles at neighbor before adding it to queue
                 if self.vertexInfo:
                     angle = atan2(neighbor[1] - current[1], neighbor[0] - current[0])
                     for vertex in self.calcVertices(angle):
@@ -287,6 +311,7 @@ class BreadthFirst(PathSolver):
                         if self.grid[neighbor[1] + int(vertex[1]), neighbor[0] + int(vertex[0])]:
                             continue
 
+                #add neighbor if not already visited
                 if neighbor not in self.parent:
                     self.frontier.put(neighbor)
                     self.parent[neighbor] = current

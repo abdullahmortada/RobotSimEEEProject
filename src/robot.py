@@ -36,6 +36,8 @@ class Robot(Bicycle):
             self.init()
         self._tolerance = tol
         self._speed = speed
+        self._timeTaken = 0
+        self._frameTime = 0.05
         self.sensor = RangeBearingSensor(robot=self, map=randMap) if randMap else None
         self.sensorRange = sensorRange 
         self.sensorAngle = sensorAngle
@@ -80,7 +82,10 @@ class Robot(Bicycle):
             #only animating if user chose to plot robot
             if self._plot:
                 self._animation.update(self.x)
-                plt.pause(0.005)
+                plt.pause(self._frameTime)
+
+            #Updating time taken
+            self._timeTaken += self._frameTime
                 
             #adding closest scanned obstacle to the grid if it has not been seen before
             if self.sensor:
@@ -114,12 +119,14 @@ class Robot(Bicycle):
 
     
     #easy to use method which automatically plans and moves to goal point using calculated path, and recalculated path if a new obstacle is scanned
-    def planAndGo(self, goal:Point):
+    def planAndGo(self, goal:Point, time = None):
         self.plan((int(self.x[0]), int(self.x[1])), goal)
         while True:
             go = False
             for point in self.points:
                 go = self.go(point)
+                if time:
+                    self.speedo((self.x[0], self.x[1]), goal, time - self._timeTaken)
                 if not go:
                     break
 
@@ -127,12 +134,14 @@ class Robot(Bicycle):
                 break
             else:
                 self.plan((int(self.x[0]), int(self.x[1])), goal)
+
     #Trajectory function (moving through the path at a certain time)
-    def speedo(self):
-         startpoint1 = input("please enter x  for the starting point")
-         startpoint2 = input("please enter y  for the starting point")
-         endpoint1 = input("please enter x  for the ending point")
-         endpoint2 = input("please enter y for the ending point")
-         time= input("please add time for this operation")
-         speed= (self.solve.heuristic((startpoint1,startpoint2),(endpoint1,endpoint2)))/time 
-         return speed
+    def speedo(self, current: Point, goal: Point, timeRemaining):
+        if isinstance(self.solver, ThetaStar):
+            self._speed = (self.solver.euclidean(current, goal)/timeRemaining )
+        else:
+            self._speed = (self.solver.heuristic(current, goal)/timeRemaining )
+        if self._speed > 6:
+            print("High speed value because of very low target time will cause unexpected behavior, \n speed:", self._speed, " but capped to 5.5")
+            self._speed = 5.5
+        print("Time remaining:", timeRemaining)
