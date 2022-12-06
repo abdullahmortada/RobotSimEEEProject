@@ -64,7 +64,7 @@ class Robot(Bicycle):
         self.vertices = [(self.x[0] + x, self.x[1] +  y), (self.x[0] - x,self.x[1] - y), (self.x[0] + x2, self.x[1] - y2), (self.x[0] - x2, self.x[1] + y2)]
             
 
-    #Function which takes goal point's x and y as a tuple, and simulates robot's movement to that position
+    #Function which takes goal point's x and y as a tuple, and simulates robot's movement to that position.
     def go(self, goal: Point):
         while(True):
             g = atan2(

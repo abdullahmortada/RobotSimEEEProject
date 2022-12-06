@@ -17,7 +17,7 @@ class PathSolver:
             self.filterMap(filterScale)  
 
 
-    #changing the scale of the obstacle by a fixed amount to make the robot move further away from the obstacles. 
+    #changing the scale of the obstacle by a fixed amount to make the robot avoid the obstacles. 
     def filterMap(self, scale: int):
         if scale < 1:
             print("Filter map aborted, invalid scale")
@@ -289,7 +289,7 @@ class BreadthFirst(PathSolver):
         self.frontier.put(start)
         self.parent[start] = None
 
-        #go through the queue of points until it is empty
+        #go through the queue of points until it is empty.
         while not self.frontier.empty():
             current = self.frontier.get()
             #return reconstructed path if reached goal

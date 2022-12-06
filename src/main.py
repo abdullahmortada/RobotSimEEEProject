@@ -5,7 +5,7 @@ from scipy.io import loadmat
 import matplotlib.pyplot as plt
 import numpy as np
 
-#Important note: "Before ruining the code you have to make sure that you are in the folder in the terminal"
+#Important note: "Before ruining the code you have to make sure that you are in the folder in the terminal."
 
 
 #defining the main function (works as a launcher for the robot).
@@ -29,13 +29,13 @@ def main():
                 x.append(j)
                 y.append(i)
 
-    #plotting the map 
+    #plotting the map where the robot will be moving in.
     plt.scatter(x, y)
     lmap.plot()
     plt.gca().set_xlim(0, 100)
     plt.gca().set_ylim(0, 100)
     
-    #moving to the goal point
+    #help the robot to reach the goal.
     veh.planAndGo((20, 90))
     plt.pause(1000)
     
