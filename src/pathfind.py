@@ -60,8 +60,9 @@ class PathSolver:
                 return False
             if self.vertexInfo:
                 for vert in vertices:
-                    if self.grid[int(point[1] + vert[1]), int(point[0] + vert[0])]:
-                        return False
+                    if (self.ylim[0] < point[1] + vert[1] < self.ylim[1]) or not (self.xlim[0] < point[0] + vert[0] < self.xlim[1]):
+                        if self.grid[int(point[1] + vert[1]), int(point[0] + vert[0])]:
+                            return False
 
 
         return True
