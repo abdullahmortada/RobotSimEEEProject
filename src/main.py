@@ -5,7 +5,7 @@ from scipy.io import loadmat
 import matplotlib.pyplot as plt
 import numpy as np
 
-#Important note: "Before ruining the code you have to make sure that you are in the folder in the terminal."
+#Important note: "Before running the code you have to make sure that you are in the folder in the terminal."
 
 
 #defining the main function (works as a launcher for the robot).
@@ -15,8 +15,9 @@ def main():
 
     x = []
     y = []
-    #x is j and y is i, as input array is transposed, very important to notice
+
     #adding ordinates of obstacles in occupancy grid to separate arrays
+    #x is j and y is i, as input array is transposed, very important to notice
     for i in range(np.shape(map)[0]):    
         for j in range(np.shape(map)[1]):
             if map[i, j]:
