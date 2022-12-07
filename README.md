@@ -2,7 +2,7 @@
 This project is a library which provides tools to simulate a robot with a given target point and occupancy map to reach the ending point using the fastest path and wihout colliding with any obstacles.
 Many tools, including path planning classes and premade bicycle model robot with required methods, are provided for many contexts.
 
-## roboticstoolbox
+## roboticstoolbox-python
 This project is based on Peter Corke's robotics toolbox for python.
 roboticstoolbox provides tools and algorithms for designing, simulating, testing, and deploying manipulator and mobile robot applications.
 
@@ -19,7 +19,33 @@ The source code is composed of two library files and a "main.py" file used as an
 ### Robot.py
 Center point of the project which includes a "Robot" class that encapsulates all the provided functionality to make everything easy to set up for brainstorming and demos, and is also a child class of the roboticstoolbox Bicycle class so includes all its functionality.
 
-# usage
+### pathfind.py
+Contains all the calculations and classes used for pathfinding, and their associated methods.
+Classes:
+    Parent PathPlanner class 
+    ThetaStar class 
+    BreadthFirst class 
+
+The ThetaStar and BreadthFirst classes are implemented of their respective pathfinding algorithm, and the option to choose between them was to demonstrate the difference between some of the well known algorithms.
+
+Breadth-First search uses a queue of points to check next and a dictionary of each visited point's parent point. When a point is taken from the queue, its unchecked neighbors are also placed in the queue, and this is repeated until the goal is reached, meaning it expands in all directions equally and does not use any scoring system which means there is many redundant iterations.
+
+![](https://github.com/abdullahmortada/RobotSimEEEProject/blob/main/breadth.png)
+*example of path created by breadth search with no random obstacles*
+
+A* search uses both a heuristic to decide a point's priority in the queue, and a cost for each node that is constantly updated when more optimal parent nodes are found.
+Theta* is an algorithm derived from A* which includes all its advantages, but also allows a point's parent to be at any angle and distance as long as there is a line of sight between them, providing less points to move to therefore more efficent paths and memory usage.
+This paper provides more insight into other any-angle algorithms:
+    https://ojs.aaai.org/index.php/SOCS/article/download/18382/18173/21898
+
+![](https://github.com/abdullahmortada/RobotSimEEEProject/blob/main/theta.png)
+*example of path created by Theta* with no random obstacles*
+
+In implemetation, the only difference between Theta* and A* is that Theta* prioritizes collapsing multiple nodes into just two nodes as long as there is a line of sight between all of the nodes.
+
+## Usage
+This library provides many functions for the robot class that can be used as so:
+
 ```python 
 from robot import Robot
 
@@ -57,29 +83,7 @@ veh = (
 #the robot also uses vertex detection by keeping track of the position of its vertices
 ```
 
-#### pathfind.py
-Contains all the calculations and classes used for pathfinding, and their associated methods.
-Classes:
-    Parent PathPlanner class 
-    ThetaStar class 
-    BreadthFirst class 
-
-The ThetaStar and BreadthFirst classes are implemented of their respective pathfinding algorithm, and the option to choose between them was to demonstrate the difference between some of the well known algorithms.
-
-Breadth-First search uses a queue of points to check next and a dictionary of each visited point's parent point. When a point is taken from the queue, its unchecked neighbors are also placed in the queue, and this is repeated until the goal is reached, meaning it expands in all directions equally and does not use any scoring system which means there is many redundant iterations.
-
-![](https://github.com/abdullahmortada/RobotSimEEEProject/blob/main/breadth.png)
-*example of path created by breadth search with no random obstacles*
-
-A* search uses both a heuristic to decide a point's priority in the queue, and a cost for each node that is constantly updated when more optimal parent nodes are found.
-Theta* is an algorithm derived from A* which includes all its advantages, but also allows a point's parent to be at any angle and distance as long as there is a line of sight between them, providing less points to move to therefore more efficent paths and memory usage.
-This paper provides more insight into other any-angle algorithms:
-    https://ojs.aaai.org/index.php/SOCS/article/download/18382/18173/21898
-
-![](https://github.com/abdullahmortada/RobotSimEEEProject/blob/main/theta.png)
-*example of path created by Theta* with no random obstacles*
-
-In implemetation, the only difference between Theta* and A* is that Theta* prioritizes collapsing multiple nodes into just two nodes as long as there is a line of sight between all of the nodes.
+The example main.py file can also be run directly for a demo, but please note you have to be in the project's main directory for it to work.
 
 ## Limitations and known issues
 When the robot's movement speed is set high relative to the tolerance and size of the robot, it moves in highly unexpected ways, happens especially when a low time condition is set, or when random obstacles cause robot to switch paths multiple times.
