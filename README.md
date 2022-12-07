@@ -1,9 +1,17 @@
 # RobotSimEEEProject
-This project is used to simulate a robot with a given target point and occupancy map to reach the ending point using fastest path and wihout colliding with any obstacles. Many tools are provided for both high level and low level contexts.
+This project is a library which provides tools to simulate a robot with a given target point and occupancy map to reach the ending point using the fastest path and wihout colliding with any obstacles.
+Many tools, including path planning classes and premade bicycle model robot with required methods, are provided for many contexts.
 
 ## roboticstoolbox
 This project is based on Peter Corke's robotics toolbox for python.
 roboticstoolbox provides tools and algorithms for designing, simulating, testing, and deploying manipulator and mobile robot applications.
+
+## Dependencies 
+Main dependencies:
+    roboticstoolbox-python < 1.0
+    numpy, matplotlib == any 
+
+scipy was also used to load the .mat file in the example usage file
 
 ## Project Structure
 The source code is composed of two library files and a "main.py" file used as an example for how to use them.
