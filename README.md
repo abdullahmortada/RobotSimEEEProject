@@ -60,17 +60,12 @@ The ThetaStar and BreadthFirst classes are implemented of their respective pathf
 
 Breadth-First search uses a queue of points to check next and a dictionary of each visited point's parent point. When a point is taken from the queue, its unchecked neighbors are also placed in the queue, and this is repeated until the goal is reached, meaning it expands in all directions equally and does not use any scoring system which means there is many redundant iterations.
 
-
-![](https://github.com/abdullahmortada/RobotSimEEEProject/blob/main/breadth.gif)
-
 A* search uses both a heuristic to decide a point's priority in the queue, and a cost for each node that is constantly updated when more optimal parent nodes are found.
 Theta* is an algorithm derived from A* which includes all its advantages, but also allows a point's parent to be at any angle and distance as long as there is a line of sight between them, providing less points to move to therefore more efficent paths and memory usage.
 This paper provides more insight into other any-angle algorithms:
     https://ojs.aaai.org/index.php/SOCS/article/download/18382/18173/21898
 
 In implemetation, the only difference between Theta* and A* is that Theta* prioritizes collapsing multiple nodes into just two nodes as long as there is a line of sight between all of the nodes.
-
-![](https://github.com/abdullahmortada/RobotSimEEEProject/blob/main/theta.gif)
 
 ## Limitations and known issues
 When the robot's movement speed is set high relative to the tolerance and size of the robot, it moves in highly unexpected ways, happens especially when a low time condition is set, or when random obstacles cause robot to switch paths multiple times.
