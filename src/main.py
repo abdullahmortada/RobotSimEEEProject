@@ -26,39 +26,42 @@ def main():
 
     
     #input coordinates
-    while True:
-        try:
-            x0 = int(input("Starting x:"))
-            y0 = int(input("Starting y:"))
-            xt = int(input("Target x:"))
-            yt = int(input("Target y:"))
-        except:
-            print("Please try again.")
-            continue
-
-        if map[y0, x0]:
-            print("Cannot start inside wall")
-            continue
-        break
+    # while True:
+    #     try:
+    #         x0 = int(input("Starting x:"))
+    #         y0 = int(input("Starting y:"))
+    #         xt = int(input("Target x:"))
+    #         yt = int(input("Target y:"))
+    #     except:
+    #         print("Please try again.")
+    #         continue
+    #
+    #     if map[y0, x0]:
+    #         print("Cannot start inside wall")
+    #         continue
+    #     break
 
     #initialize robot 
     veh = Robot(
             animPath="./car.png", map=map, 
             animScale=6, scaleRatio=1,
             filter=True, filterScale=2,
-            x0=[x0, y0, 0], randMap=lmap, # solver=BreadthFirst, 
+            x0=[50, 30, 0], solver=BreadthFirst, # randMap=lmap, 
             sensorRange=4,
                 )
 
 
     #plotting the map where the robot will be moving in.
     plt.scatter(x, y)
-    lmap.plot()
+    plt.scatter(20, 90, c='g')
+    plt.scatter(50, 30, c='r')
+    # lmap.plot()
     plt.gca().set_xlim(0, 100)
     plt.gca().set_ylim(0, 100)
 
     #plan and go to the target
-    veh.planAndGo((xt, yt))
+    plt.pause(5)
+    veh.planAndGo((20, 90))
     plt.pause(1000)
     
 
