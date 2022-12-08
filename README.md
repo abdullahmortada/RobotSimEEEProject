@@ -8,7 +8,7 @@ roboticstoolbox provides tools and algorithms for designing, simulating, testing
 
 ## Dependencies 
 Main dependencies:
-    roboticstoolbox-python < 1.0
+    roboticstoolbox-python < 1.0  
     numpy, matplotlib == any 
 
 scipy was also used to load the .mat file in the example usage file
@@ -39,7 +39,7 @@ This paper provides more insight into other any-angle algorithms:
     https://ojs.aaai.org/index.php/SOCS/article/download/18382/18173/21898
 
 ![](https://github.com/abdullahmortada/RobotSimEEEProject/blob/main/theta.png)
-*example of path created by Theta* with no random obstacles*
+*example of path created by ThetaStar with no random obstacles*
 
 In implemetation, the only difference between Theta* and A* is that Theta* prioritizes collapsing multiple nodes into just two nodes as long as there is a line of sight between all of the nodes.
 
