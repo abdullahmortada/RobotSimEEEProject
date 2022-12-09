@@ -39,6 +39,9 @@ def main():
         if map[y0, x0]:
             print("Cannot start inside wall")
             continue
+        if map[yt, xt]:
+            print("Target in wall")
+            continue
         break
 
     #initialize robot 
