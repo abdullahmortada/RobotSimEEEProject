@@ -98,3 +98,6 @@ Below is a high level view of the tasks done by the robot in the main.py file pr
 
 ![](https://github.com/abdullahmortada/RobotSimEEEProject/blob/main/Flowchart.png)
 
+## Flowchart of go function
+![](https://github.com/abdullahmortada/RobotSimEEEProject/blob/main/go function.png)
+
