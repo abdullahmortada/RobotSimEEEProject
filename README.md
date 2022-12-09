@@ -98,6 +98,6 @@ Below is a high level view of the tasks done by the robot in the main.py file pr
 
 ![](https://github.com/abdullahmortada/RobotSimEEEProject/blob/main/Flowchart.png)
 
-And here is the logic behind the go finction which moves the robot to a target point
+And here is the logic behind the go function which moves the robot to a target point
 ![](https://github.com/abdullahmortada/RobotSimEEEProject/blob/main/go%20function.png)
 
