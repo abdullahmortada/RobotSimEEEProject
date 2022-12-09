@@ -101,3 +101,5 @@ Below is a high level view of the tasks done by the robot in the main.py file pr
 And here is the logic behind the go function which moves the robot to a target point
 ![](https://github.com/abdullahmortada/RobotSimEEEProject/blob/main/go%20function.png)
 
+You can find below how the robot can plan (PlanAndGo function) with respect to moving by go function through the points in the map
+![](https://github.com/abdullahmortada/RobotSimEEEProject/blob/main/PlanAndGo%20Flowchart.png)
