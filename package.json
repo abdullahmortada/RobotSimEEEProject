@@ -1,0 +1,23 @@
+{
+  "name": "robproject",
+  "version": "1.0.0",
+  "description": "This project is a library which provides tools to simulate a robot with a given target point and occupancy map to reach the ending point using the fastest path and wihout colliding with any obstacles. Many tools, including path planning classes and premade bicycle model robot with required methods, are provided for many contexts.",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/abdullahmortada/RobotSimEEEProject.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/abdullahmortada/RobotSimEEEProject/issues"
+  },
+  "homepage": "https://github.com/abdullahmortada/RobotSimEEEProject#readme",
+  "dependencies": {
+    "body-parser": "^1.20.1",
+    "express": "^4.18.2"
+  }
+}

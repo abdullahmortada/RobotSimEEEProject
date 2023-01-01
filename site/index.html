@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Robot Simulation</title>
+    <style>
+      #inputs {
+        display: flex;
+      }
+
+      body {
+      }
+    </style>
+  </head>
+  <body>
+    <script>
+      async function run() {
+        animScale = document.getElementById("animscale").value;
+        randomObstacles = document.getElementById("randMap-checkbox").checked;
+        filter = document.getElementById("filter").checked;
+        filterScale = document.getElementById("filterScale").value;
+        obstacleDensity = document.getElementById("randMap-val").value;
+        solver = document.getElementById("solver").checked;
+        x0 = document.getElementById("x0").value;
+        y0 = document.getElementById("y0").value;
+        xt = document.getElementById("xt").value;
+        yt = document.getElementById("yt").value;
+
+        list = [
+          `animScale=${animScale}`,
+          `randomObstacles=${randomObstacles}`,
+          `filter=${filter}`,
+          `filterScale=${filterScale}`,
+          `obstacleDensity=${obstacleDensity}`,
+          `start=${x0},${y0}`,
+          `goal=${xt},${yt}`,
+          `solver=${solver}`,
+        ];
+
+        url = window.location.href + "run";
+
+        let res = await fetch(url, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(list),
+        });
+      }
+    </script>
+    <div id="inputs">
+      <input type="checkbox" id="randMap-checkbox" />
+      <label for="randMap-checkbox">Random obstacles</label>
+
+      <input type="number" id="randMap-val" min="2" max="400" />
+      <label for="randMap-val">Random obstacle density</label>
+
+      <input type="number" id="animscale" min="1" max="11" />
+      <label for="animscale">vehicle scale</label>
+
+      <input type="checkbox" id="filter" />
+      <label for="filter">Use map filtering</label>
+
+      <input type="number" id="filterScale" min="2" max="5" />
+      <label for="filterScale">filter intensity</label>
+
+      <input type="checkbox" id="solver" />
+      <label for="solver">Use BreadthFirst search</label>
+
+      <input type="number" id="x0" placeholder="start x" />
+      <input type="number" id="y0" placeholder="start y" />
+      <input type="number" id="xt" placeholder="target x" />
+      <input type="number" id="yt" placeholder="target y" />
+    </div>
+    <button id="run" onclick="run()">Run</button>
+  </body>
+</html>

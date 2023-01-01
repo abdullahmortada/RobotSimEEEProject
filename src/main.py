@@ -4,14 +4,23 @@ from pathfind import *
 from scipy.io import loadmat
 import matplotlib.pyplot as plt
 import numpy as np
+import sys
 
 #Important note: "Before running the code you have to make sure that you are in the folder in the terminal."
 
 
+def validatePos(map, x0, y0, xt, yt):
+    if map[y0, x0]:
+        print("Cannot start inside wall")
+        exit()
+    if map[yt, xt]:
+        print("Target in wall")
+        exit()
+    return True
+
 #defining the main function (works as a launcher for the robot).
-def main():
+def main(**kwargs):
     map = loadmat("./map1.mat")['map']
-    lmap = LandmarkMap(140, 100)
 
     x = []
     y = []
@@ -26,45 +35,46 @@ def main():
 
     
     #input coordinates
-    while True:
-        try:
-            x0 = int(input("Starting x:"))
-            y0 = int(input("Starting y:"))
-            xt = int(input("Target x:"))
-            yt = int(input("Target y:"))
-        except:
-            print("Please try again.")
-            continue
+    x0, y0 = kwargs['start'].split(',')
+    xt, yt = kwargs['goal'].split(',')
+    x0 = int(x0)
+    xt = int(xt)
+    yt = int(yt)
+    y0 = int(y0)
 
-        if map[y0, x0]:
-            print("Cannot start inside wall")
-            continue
-        if map[yt, xt]:
-            print("Target in wall")
-            continue
-        break
+    validatePos(map, x0, y0, xt, yt)
+
+    animScale = int(kwargs['animScale']) if 'animScale' in kwargs else 6
+    filter = True if 'filter' in kwargs and kwargs['filter'][0] == 't' else False
+    filterScale = int(kwargs['filterScale']) if 'filterScale' in kwargs else 2
+    obsDensity = int(kwargs['obstacleDensity']) if 'obstacleDensity' in kwargs else 140
+    print(kwargs['randomObstacles'])
+    lmap = LandmarkMap(obsDensity, 100) if 'randomObstacles' in kwargs and kwargs['randomObstacles'][0] == 't' else None 
+    solver = BreadthFirst if 'solver' in kwargs and kwargs['solver'][0] == 't' else ThetaStar
 
     #initialize robot 
     veh = Robot(
             animPath="./car.png", map=map, 
-            animScale=6, scaleRatio=1,
-            filter=True, filterScale=2,
-            x0=[x0, y0, 0], randMap=lmap, # solver=BreadthFirst, 
+            animScale=animScale, scaleRatio=1,
+            filter=filter, filterScale=filterScale,
+            x0=[x0, y0, 0], randMap=lmap, solver=solver, 
             sensorRange=4,
                 )
 
 
     #plotting the map where the robot will be moving in.
     plt.scatter(x, y)
-    lmap.plot()
+    plt.scatter(xt, yt, color='g')
+    if lmap:
+        lmap.plot()
     plt.gca().set_xlim(0, 100)
     plt.gca().set_ylim(0, 100)
 
     #plan and go to the target
     veh.planAndGo((xt, yt))
-    plt.pause(1000)
+    plt.pause(5)
     
 
 
 if __name__ == "__main__":
-    main()
+    main(**dict(arg.split('=') for arg in sys.argv[1:]))
