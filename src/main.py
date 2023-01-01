@@ -44,11 +44,10 @@ def main(**kwargs):
 
     validatePos(map, x0, y0, xt, yt)
 
-    animScale = int(kwargs['animScale']) if 'animScale' in kwargs else 6
+    animScale = int(kwargs['animScale']) if 'animScale' in kwargs and len(kwargs['animScale']) > 0 else 6
     filter = True if 'filter' in kwargs and kwargs['filter'][0] == 't' else False
-    filterScale = int(kwargs['filterScale']) if 'filterScale' in kwargs else 2
-    obsDensity = int(kwargs['obstacleDensity']) if 'obstacleDensity' in kwargs else 140
-    print(kwargs['randomObstacles'])
+    filterScale = int(kwargs['filterScale']) if 'filterScale' in kwargs and len(kwargs['filterScale']) > 0 else 2
+    obsDensity = int(kwargs['obstacleDensity']) if 'obstacleDensity' in kwargs and len(kwargs['obstacleDensity']) > 0 else 140
     lmap = LandmarkMap(obsDensity, 100) if 'randomObstacles' in kwargs and kwargs['randomObstacles'][0] == 't' else None 
     solver = BreadthFirst if 'solver' in kwargs and kwargs['solver'][0] == 't' else ThetaStar
 
