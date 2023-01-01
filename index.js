@@ -13,7 +13,7 @@ app.post("/run", bp.json(), (req, res) => {
 
 app.listen(port, () => console.log(`Server listening on port: ${port}`));
 
-async function run(opts) {
+function run(opts) {
   const spawner = require("child_process").spawnSync;
   const proc = spawner("python", ["./src/main.py", ...opts], {
     encoding: "utf8",

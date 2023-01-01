@@ -6,11 +6,40 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Robot Simulation</title>
     <style>
-      #inputs {
+      #main {
         display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-items: center;
       }
 
       body {
+        display: flex;
+        justify-content: center;
+      }
+      ul {
+        display: grid;
+        grid-gap: 4%;
+        grid-template-rows: 48% 48%;
+        justify-items: center;
+        align-items: center;
+        list-style-type: none;
+        margin: 0;
+        padding: 0;
+      }
+      li {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex: 1 1;
+      }
+      input {
+        margin-right: 12px;
+      }
+      label {
+        text-align: center;
+        font: Arial;
+        margin-right: 2px;
       }
     </style>
   </head>
@@ -20,7 +49,7 @@
         animScale = document.getElementById("animscale").value;
         randomObstacles = document.getElementById("randMap-checkbox").checked;
         filter = document.getElementById("filter").checked;
-        filterScale = document.getElementById("filterScale").value;
+        filterScale = document.getElementById("filterscale").value;
         obstacleDensity = document.getElementById("randMap-val").value;
         solver = document.getElementById("solver").checked;
         x0 = document.getElementById("x0").value;
@@ -48,32 +77,86 @@
           },
           body: JSON.stringify(list),
         });
+
+        if (res.body == 1) {
+          alert("Please change starting coordinates as they are inside a wall");
+        }
+        if (res.body == 2) {
+          alert("Please change target coordinates as they are inside a wall");
+        }
       }
     </script>
-    <div id="inputs">
-      <input type="checkbox" id="randMap-checkbox" />
-      <label for="randMap-checkbox">Random obstacles</label>
+    <div id="main">
+      <ul>
+        <li>
+          <label for="randMap-checkbox">Random obstacles</label>
+          <input type="checkbox" id="randMap-checkbox" />
 
-      <input type="number" id="randMap-val" min="2" max="400" />
-      <label for="randMap-val">Random obstacle density</label>
+          <label for="randMap-val"
+            >Random obstacle density <br />
+            (2 - 400)</label
+          >
+          <input type="number" id="randMap-val" min="2" max="400" />
+        </li>
 
-      <input type="number" id="animscale" min="1" max="11" />
-      <label for="animscale">vehicle scale</label>
+        <li>
+          <label for="animscale"
+            >vehicle scale <br />
+            (1 - 11)</label
+          >
+          <input type="number" id="animscale" min="1" max="11" />
+        </li>
 
-      <input type="checkbox" id="filter" />
-      <label for="filter">Use map filtering</label>
+        <li>
+          <label for="filter">map filtering</label>
+          <input type="checkbox" id="filter" />
 
-      <input type="number" id="filterScale" min="2" max="5" />
-      <label for="filterScale">filter intensity</label>
+          <label for="filterscale"
+            >filter intensity <br />
+            (2 - 5)</label
+          >
+          <input type="number" id="filterscale" min="2" max="5" />
+        </li>
 
-      <input type="checkbox" id="solver" />
-      <label for="solver">Use BreadthFirst search</label>
+        <li>
+          <label for="solver">Use BreadthFirst search</label>
+          <input type="checkbox" id="solver" />
+        </li>
 
-      <input type="number" id="x0" placeholder="start x" />
-      <input type="number" id="y0" placeholder="start y" />
-      <input type="number" id="xt" placeholder="target x" />
-      <input type="number" id="yt" placeholder="target y" />
+        <li>
+          <input
+            type="number"
+            id="x0"
+            placeholder="start x"
+            min="0"
+            max="100"
+          />
+          <input
+            type="number"
+            id="y0"
+            placeholder="start y"
+            min="0"
+            max="100"
+          />
+        </li>
+        <li>
+          <input
+            type="number"
+            id="xt"
+            placeholder="target x"
+            min="0"
+            max="100"
+          />
+          <input
+            type="number"
+            id="yt"
+            placeholder="target y"
+            min="0"
+            max="100"
+          />
+        </li>
+        <li><button id="run" onclick="run()">Run</button></li>
+      </ul>
     </div>
-    <button id="run" onclick="run()">Run</button>
   </body>
 </html>
